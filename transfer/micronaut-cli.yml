@@ -1,5 +1,5 @@
 profile: service
-defaultPackage: example
+defaultPackage: transfer
 ---
 testFramework: junit
 sourceLanguage: java

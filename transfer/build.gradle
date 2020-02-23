@@ -4,6 +4,7 @@ plugins {
     id "application"
     id "io.freefair.lombok" version "5.0.0-rc2"
     id 'java-library'
+    id "org.flywaydb.flyway" version "6.2.4"
 
 }
 java {
@@ -45,6 +46,10 @@ dependencies {
     implementation "javax.annotation:javax.annotation-api"
     implementation "io.micronaut:micronaut-http-server-netty"
     implementation "io.micronaut:micronaut-http-client"
+    implementation "io.micronaut.configuration:micronaut-jdbc-hikari"
+    implementation 'io.micronaut.configuration:micronaut-flyway'
+    compile 'io.micronaut.configuration:micronaut-jooq'
+
     runtimeOnly "ch.qos.logback:logback-classic:$rootProject.ext.logbackVersion"
 
     testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
@@ -60,6 +65,8 @@ dependencies {
     testImplementation "net.bytebuddy:byte-buddy-agent:1.8.22"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$rootProject.ext.junitVersion"
+
+    runtime 'com.h2database:h2'
 }
 
 test.classpath += configurations.developmentOnly
