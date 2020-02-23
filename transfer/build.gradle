@@ -16,6 +16,8 @@ ext{
     junitVersion = '5.6.0'
     logbackVersion = '1.2.3'
     assertjVersion = '3.11.1'
+    mockitoVersion = '2.16.0'
+    mockitoJunitVersion = '2.17.0'
 }
 
 version "0.1"
@@ -35,6 +37,7 @@ dependencies {
     annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
+
     implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     implementation "io.micronaut:micronaut-inject"
     implementation "io.micronaut:micronaut-validation"
@@ -43,12 +46,19 @@ dependencies {
     implementation "io.micronaut:micronaut-http-server-netty"
     implementation "io.micronaut:micronaut-http-client"
     runtimeOnly "ch.qos.logback:logback-classic:$rootProject.ext.logbackVersion"
+
     testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     testImplementation "org.junit.jupiter:junit-jupiter-api:$rootProject.ext.junitVersion"
     testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.assertj:assertj-core:$rootProject.ext.assertjVersion"
+    testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$rootProject.ext.mockitoJunitVersion"
+    testImplementation "net.bytebuddy:byte-buddy:1.8.22"
+    testImplementation "net.bytebuddy:byte-buddy-agent:1.8.22"
+
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$rootProject.ext.junitVersion"
 }
 
