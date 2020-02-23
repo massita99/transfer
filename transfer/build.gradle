@@ -19,6 +19,8 @@ ext{
     assertjVersion = '3.11.1'
     mockitoVersion = '2.16.0'
     mockitoJunitVersion = '2.17.0'
+    modelMapperVersion = '2.17.0'
+    modelMapperJooqVersion = '2.3.6'
 }
 
 version "0.1"
@@ -48,6 +50,10 @@ dependencies {
     implementation "io.micronaut:micronaut-http-client"
     implementation "io.micronaut.configuration:micronaut-jdbc-hikari"
     implementation 'io.micronaut.configuration:micronaut-flyway'
+    implementation 'org.jooq:jooq'
+    implementation "org.modelmapper:modelmapper:$modelMapperJooqVersion"
+    implementation "org.modelmapper.extensions:modelmapper-jooq:$modelMapperJooqVersion"
+
     compile 'io.micronaut.configuration:micronaut-jooq'
 
     runtimeOnly "ch.qos.logback:logback-classic:$rootProject.ext.logbackVersion"
