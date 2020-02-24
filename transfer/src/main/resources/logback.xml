@@ -12,4 +12,13 @@
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
+
+    <Logger name="org.jooq" level="debug">
+        <AppenderRef ref="STDOUT"/>
+    </Logger>
+
+    <Logger name="com.zaxxer.hikari" level="debug">
+        <AppenderRef ref="STDOUT"/>
+    </Logger>
+
 </configuration>

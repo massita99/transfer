@@ -7,6 +7,7 @@ import org.modelmapper.convention.NameTokenizers;
 import org.modelmapper.jooq.RecordValueReader;
 import transfer.configuration.converter.AccountConverter;
 import transfer.configuration.converter.InstantConverter;
+import transfer.configuration.converter.TransactionConverter;
 
 @Factory
 public class ConfigurationFactory {
@@ -22,10 +23,11 @@ public class ConfigurationFactory {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE)
+        mapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.CAMEL_CASE)
                 .addValueReader(new RecordValueReader());
 
         mapper.addConverter(new AccountConverter());
+        mapper.addConverter(new TransactionConverter());
         mapper.getConfiguration().getConverters().add(new InstantConverter());
 
         return mapper;

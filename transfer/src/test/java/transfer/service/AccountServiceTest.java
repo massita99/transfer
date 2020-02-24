@@ -2,7 +2,6 @@ package transfer.service;
 
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-import transfer.dao.AccountDao;
 
 import javax.inject.Inject;
 
@@ -15,9 +14,6 @@ public class AccountServiceTest {
 
     @Inject
     AccountService accountService;
-
-    @Inject
-    AccountDao accountDao;
 
     @Test
     void testCreateAccount() {

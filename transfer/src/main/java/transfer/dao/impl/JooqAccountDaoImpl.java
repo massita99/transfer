@@ -11,8 +11,6 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.field;
@@ -65,12 +63,12 @@ public class JooqAccountDaoImpl implements AccountDao {
     @Override
     public Optional<Account> lockAndGet(String id, Configuration transactionKeeper) {
         var account = DSL.using(transactionKeeper).selectFrom(ACCOUNT)
-                    .where(field(Account.Fields.id).eq(id))
-                    .forUpdate()
-                    .fetch()
-                    .stream()
-                    .map(e -> modelMapper.map(e, Account.class))
-                    .findFirst();
+                .where(field(Account.Fields.id).eq(id))
+                .forUpdate()
+                .fetch()
+                .stream()
+                .map(e -> modelMapper.map(e, Account.class))
+                .findFirst();
 
         if (account.isEmpty()) {
             return Optional.empty();
@@ -88,7 +86,6 @@ public class JooqAccountDaoImpl implements AccountDao {
                 .where(field(Account.Fields.id).eq(entity.getId()))
                 .execute();
     }
-
 
 
 }
