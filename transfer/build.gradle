@@ -70,6 +70,7 @@ dependencies {
     testImplementation "net.bytebuddy:byte-buddy:1.8.22"
     testImplementation "net.bytebuddy:byte-buddy-agent:1.8.22"
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$rootProject.ext.junitVersion"
 
