@@ -2,6 +2,7 @@ package transfer.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import static java.time.Instant.now;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @FieldNameConstants
+@NoArgsConstructor
 public class Transaction {
 
     public static final String TRANSACTION = "TRANSACTION";

@@ -10,9 +10,13 @@ import transfer.model.Transaction;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
+import static transfer.util.StringUtil.fromCamelCase;
 import static transfer.model.Transaction.TRANSACTION;
 import static transfer.model.Transaction.TRANSACTION_SEQ;
 
@@ -38,5 +42,25 @@ public class JooqTransactionDaoImpl implements TransactionDao {
                 .execute();
 
         return transaction;
+    }
+
+    @Override
+    public List<Transaction> findAll() {
+        return dsl.selectFrom(TRANSACTION)
+                .fetch()
+                .stream()
+                .map(e -> modelMapper.map(e, Transaction.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Transaction> findAllByAccountId(String accountId) {
+        return dsl.selectFrom(TRANSACTION)
+                .where(field(fromCamelCase(Transaction.Fields.accountToId)).eq(accountId)
+                        .or(field(fromCamelCase(Transaction.Fields.accountFromId)).eq(accountId)))
+                .fetch()
+                .stream()
+                .map(e -> modelMapper.map(e, Transaction.class))
+                .collect(Collectors.toList());
     }
 }

@@ -59,4 +59,33 @@ class TransactionServiceTest {
         assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
     }
 
+    @Test
+    void testGetAllExistedTransactions() {
+        //Given
+        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
+        Account accountTo = accountService.create();
+        transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
+
+        //When
+        var transactions = transactionService.getAll();
+        //Then
+        assertThat(transactions).isNotEmpty();
+    }
+
+    @Test
+    void testGetAllExistedTransactionsByAccount() {
+        //Given
+        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
+        Account accountTo = accountService.create();
+
+        //Make two transactions with same accounts
+        transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
+        transactionService.performTransaction(accountTo.getId(), accountFrom.getId(), BigDecimal.TEN);
+
+        //When
+        var transactions = transactionService.getAllByAccountId(accountFrom.getId());
+        //Then
+        assertThat(transactions.size()).isEqualTo(2);
+    }
+
 }

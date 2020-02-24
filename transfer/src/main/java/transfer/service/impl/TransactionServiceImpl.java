@@ -3,6 +3,7 @@ package transfer.service.impl;
 import transfer.dao.AccountDao;
 import transfer.dao.TransactionDao;
 import transfer.dao.transaction.JooqTransactionProvider;
+import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEhoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
 import transfer.service.TransactionService;
@@ -10,6 +11,7 @@ import transfer.service.TransactionService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Singleton
 public class TransactionServiceImpl implements TransactionService {
@@ -45,5 +47,19 @@ public class TransactionServiceImpl implements TransactionService {
 
             transactionDao.createInTransaction(fromAccountId, toAccountId, amount, configuration);
         });
+    }
+
+    @Override
+    public List<Transaction> getAll() {
+        return transactionDao.findAll();
+    }
+
+    @Override
+    public List<Transaction> getAllByAccountId(String accountId) {
+        var account = accountDao.find(accountId);
+        if (account.isEmpty()) {
+            throw new AccountNotExistException(accountId);
+        }
+        return transactionDao.findAllByAccountId(accountId);
     }
 }
