@@ -30,4 +30,14 @@ public class Account {
         this.created = now();
     }
 
+    public Account minus(BigDecimal amount) {
+        balance = balance.subtract(amount);
+        return this;
+    }
+
+    public Account plus(BigDecimal amount) {
+        balance = balance.add(amount);
+        return this;
+    }
+
 }

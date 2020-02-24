@@ -2,8 +2,8 @@ package transfer.service.impl;
 
 import transfer.dao.AccountDao;
 import transfer.dao.TransactionDao;
+import transfer.dao.transaction.JooqTransactionProvider;
 import transfer.model.exception.AccountDoNotHaveEhoughMoneyException;
-import transfer.model.Transaction;
 import transfer.model.exception.AccountNotExistException;
 import transfer.service.TransactionService;
 
@@ -20,22 +20,30 @@ public class TransactionServiceImpl implements TransactionService {
     @Inject
     private AccountDao accountDao;
 
+    @Inject
+    private JooqTransactionProvider transactionProvider;
+
 
     @Override
-    public Transaction create(String fromAccountId, String toAccountId, BigDecimal amount) {
-        var fromAccount = accountDao.find(fromAccountId);
-        var toAccount = accountDao.find(toAccountId);
-        if (fromAccount.isEmpty()) {
-            throw new AccountNotExistException(fromAccountId);
-        }
-        if (toAccount.isEmpty()) {
-            throw new AccountNotExistException(toAccountId);
-        }
-        if (fromAccount.get().getBalance().compareTo(amount) < 0)
-        {
-            throw new AccountDoNotHaveEhoughMoneyException(fromAccountId);
-        }
+    public void performTransaction(String fromAccountId, String toAccountId, BigDecimal amount) {
+        transactionProvider.doInTransaction(configuration -> {
 
-        return transactionDao.create(fromAccountId, toAccountId, amount);
+            var fromAccount = accountDao.lockAndGet(fromAccountId, configuration);
+            var toAccount = accountDao.lockAndGet(toAccountId, configuration);
+            if (fromAccount.isEmpty()) {
+                throw new AccountNotExistException(fromAccountId);
+            }
+            if (toAccount.isEmpty()) {
+                throw new AccountNotExistException(toAccountId);
+            }
+            if (fromAccount.get().getBalance().compareTo(amount) < 0) {
+                throw new AccountDoNotHaveEhoughMoneyException(fromAccountId);
+            }
+
+            accountDao.updateLocked(fromAccount.get().minus(amount), configuration);
+            accountDao.updateLocked(toAccount.get().plus(amount), configuration);
+
+            transactionDao.createInTransaction(fromAccountId, toAccountId, amount, configuration);
+        });
     }
 }

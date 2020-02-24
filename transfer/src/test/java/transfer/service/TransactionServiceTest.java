@@ -2,6 +2,7 @@ package transfer.service;
 
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+import transfer.TestHelper;
 import transfer.model.Account;
 
 import javax.inject.Inject;
@@ -9,7 +10,6 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 
 @MicronautTest
 class TransactionServiceTest {
@@ -20,18 +20,23 @@ class TransactionServiceTest {
     @Inject
     AccountService accountService;
 
+    @Inject
+    TestHelper testHelper;
+
     @Test
     void testCreateNewTransaction() {
         //Given
-        Account accountFrom = accountService.create();
+        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
         Account accountTo = accountService.create();
 
         //When
-        var transaction = transactionService.create(accountFrom.getId(), accountTo.getId(), BigDecimal.ZERO);
+        transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
 
         //Then
-        assertThat(transaction).isNotNull();
-        assertThat(transaction.getId()).isNotZero();
+        Account accountFromAfterTransaction = accountService.getById(accountFrom.getId()).get();
+        assertThat(accountFromAfterTransaction.getBalance()).isZero();
+
+
     }
 
     @Test
@@ -41,7 +46,7 @@ class TransactionServiceTest {
         Account accountTo = new Account();
 
         //Then
-        assertThatThrownBy(() -> transactionService.create(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
+        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
     }
 
     @Test
@@ -51,7 +56,7 @@ class TransactionServiceTest {
         Account accountTo = accountService.create();
 
         //Then
-        assertThatThrownBy(() -> transactionService.create(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
+        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
     }
 
 }

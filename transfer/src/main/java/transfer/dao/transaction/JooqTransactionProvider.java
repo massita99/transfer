@@ -3,6 +3,7 @@ package transfer.dao.transaction;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
+import transfer.model.exception.LockException;
 
 import javax.inject.Inject;
 import java.util.function.Consumer;

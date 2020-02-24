@@ -49,10 +49,8 @@ class JooqTransactionProviderTest {
         //When
         Executors.newSingleThreadExecutor().submit(() -> transactionProvider.doInTransaction(configuration -> {
             accountDao.lockAndGet(account.getId(), configuration);
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            while (true) {
+                //Lock forever
             }
         }));
 

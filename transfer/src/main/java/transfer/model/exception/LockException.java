@@ -1,4 +1,4 @@
-package transfer.dao.transaction;
+package transfer.model.exception;
 
 public class LockException extends RuntimeException {
 
