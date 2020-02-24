@@ -1,37 +1,23 @@
 package transfer.service;
 
 import io.micronaut.test.annotation.MicronautTest;
-import io.micronaut.test.annotation.MockBean;
 import org.junit.jupiter.api.Test;
 import transfer.dao.AccountDao;
-import transfer.model.Account;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 public class AccountServiceTest {
 
-    public static final UUID TEST_UUID = UUID.fromString("A-A-A-A-A");
-    public static final Account TEST_ACCOUNT = new Account();
+    public static final String TEST_UUID = "A-A-A-A-A";
 
     @Inject
     AccountService accountService;
 
     @Inject
     AccountDao accountDao;
-
-    @MockBean(AccountDao.class)
-    public AccountDao accountDao() {
-        return mock(AccountDao.class);
-    }
 
     @Test
     void testCreateAccount() {
@@ -65,20 +51,16 @@ public class AccountServiceTest {
     @Test
     void testGetExistedAccountById() {
         //Given
-        when(accountDao.find(TEST_UUID))
-                .thenReturn(Optional.of(TEST_ACCOUNT));
+        var createdAccount = accountService.create();
         //When
-        var account = accountService.getById(TEST_UUID);
+        var account = accountService.getById(createdAccount.getId());
         //Then
         assertThat(account.isPresent()).isTrue();
-        assertThat(account.get()).isEqualTo(TEST_ACCOUNT);
+        assertThat(account.get()).isEqualTo(createdAccount);
     }
 
     @Test
     void testGetNoAccountForNotExistedId() {
-        //Given
-        when(accountDao.find(TEST_UUID))
-                .thenReturn(Optional.empty());
         //When
         var account = accountService.getById(TEST_UUID);
         //Then
@@ -88,11 +70,12 @@ public class AccountServiceTest {
     @Test
     void testGetAllExistedAccounts() {
         //Given
-        when(accountDao.findAll())
-                .thenReturn(List.of(TEST_ACCOUNT));
+        var createdAccount1 = accountService.create();
+        var createdAccount2 = accountService.create();
+
         //When
         var accounts = accountService.getAll();
         //Then
-        assertThat(accounts).containsExactly(TEST_ACCOUNT);
+        assertThat(accounts).contains(createdAccount1, createdAccount2);
     }
 }

@@ -2,23 +2,20 @@ package configuration;
 
 import io.micronaut.test.annotation.MicronautTest;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.TableRecord;
+import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import transfer.model.Account;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.jooq.impl.DSL.dropSequence;
-import static org.jooq.impl.DSL.table;
-import static transfer.model.Account.ACCOUNT;
-
 import javax.inject.Inject;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.table;
+import static transfer.model.Account.ACCOUNT;
 
 @MicronautTest
 public class JooqTest {
@@ -31,13 +28,11 @@ public class JooqTest {
 
     @Test
     void testDbInitialTablesExist() {
-        //When
-        int count = dsl.selectCount()
+        //Just do not throw
+        dsl.selectCount()
                 .from(ACCOUNT)
                 .fetchOne(0, int.class);
 
-        //Then
-        assertThat(count).isEqualTo(0);
 
     }
 
@@ -63,6 +58,36 @@ public class JooqTest {
         assertThat(accounts).extracting(Account::getCreated)
                 .contains(account.getCreated());
 
+    }
+
+    @Test
+    void testDbLockingQueries() {
+        //Given
+        var account = new Account();
+        var record = modelMapper.map(account, Map.class);
+        dsl.transaction(configuration -> {
+            DSL.using(configuration).insertInto(table(ACCOUNT))
+                    .set(record)
+                    .execute();
+        });
+
+        dsl.transaction(configuration -> {
+            //When
+            //Lock in current transaction
+            DSL.using(configuration).selectFrom(ACCOUNT)
+                    .where(field(Account.Fields.id).eq(account.getId()))
+                    .forUpdate()
+                    .fetch();
+
+            //Then
+            //Try to get the same recs in different transaction
+            assertThatThrownBy(() -> dsl.selectFrom(ACCOUNT)
+                    .where(field(Account.Fields.id).eq(account.getId()))
+                    .forUpdate()
+                    .fetch());
+
+            // Implicit commit executed here
+        });
     }
 
 

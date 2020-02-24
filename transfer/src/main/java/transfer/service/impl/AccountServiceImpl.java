@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class AccountServiceImpl implements AccountService {
@@ -18,11 +17,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account create() {
-        return new Account();
+        return accountDao.create();
     }
 
     @Override
-    public Optional<Account> getById(UUID id) {
+    public Optional<Account> getById(String id) {
         return accountDao.find(id);
     }
 

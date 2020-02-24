@@ -23,7 +23,7 @@ public interface AccountService {
       * @param id - id of account
      * @return stored {@link Account} with specified id
      */
-    Optional<Account> getById(UUID id);
+    Optional<Account> getById(String id);
 
     /**
      * Return all stored {@link Account}s
