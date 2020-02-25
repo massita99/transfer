@@ -33,7 +33,7 @@ class TransactionServiceTest {
         transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
 
         //Then
-        Account accountFromAfterTransaction = accountService.getById(accountFrom.getId()).get();
+        Account accountFromAfterTransaction = accountService.getById(accountFrom.getId());
         assertThat(accountFromAfterTransaction.getBalance()).isZero();
 
 

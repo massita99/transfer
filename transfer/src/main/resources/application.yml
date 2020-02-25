@@ -11,3 +11,6 @@ flyway:
   datasources:
     default:
       locations: classpath:databasemigrations
+jackson:
+  serialization:
+    writeDatesAsTimestamps: false

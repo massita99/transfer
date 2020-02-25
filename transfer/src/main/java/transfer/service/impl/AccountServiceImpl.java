@@ -2,12 +2,12 @@ package transfer.service.impl;
 
 import transfer.dao.AccountDao;
 import transfer.model.Account;
+import transfer.model.exception.AccountNotExistException;
 import transfer.service.AccountService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class AccountServiceImpl implements AccountService {
@@ -21,8 +21,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> getById(String id) {
-        return accountDao.find(id);
+    public Account getById(String id) {
+        return accountDao.find(id).orElseThrow(() -> new AccountNotExistException(id));
     }
 
     @Override

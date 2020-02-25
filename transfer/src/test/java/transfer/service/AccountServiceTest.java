@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @MicronautTest
 public class AccountServiceTest {
@@ -51,16 +52,13 @@ public class AccountServiceTest {
         //When
         var account = accountService.getById(createdAccount.getId());
         //Then
-        assertThat(account.isPresent()).isTrue();
-        assertThat(account.get()).isEqualTo(createdAccount);
+        assertThat(account).isEqualTo(createdAccount);
     }
 
     @Test
     void testGetNoAccountForNotExistedId() {
-        //When
-        var account = accountService.getById(TEST_UUID);
-        //Then
-        assertThat(account.isPresent()).isFalse();
+        //When Then
+        assertThatThrownBy(() -> accountService.getById(TEST_UUID));
     }
 
     @Test
