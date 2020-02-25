@@ -4,7 +4,7 @@ import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import transfer.TestHelper;
 import transfer.model.Account;
-import transfer.model.exception.AccountDoNotHaveEhoughMoneyException;
+import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
 
 import javax.inject.Inject;
@@ -60,7 +60,7 @@ class TransactionServiceTest {
 
         //Then
         assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN))
-                .isInstanceOf(AccountDoNotHaveEhoughMoneyException.class);
+                .isInstanceOf(AccountDoNotHaveEnoughMoneyException.class);
     }
 
     @Test

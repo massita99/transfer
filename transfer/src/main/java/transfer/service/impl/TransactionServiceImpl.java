@@ -4,7 +4,7 @@ import transfer.dao.AccountDao;
 import transfer.dao.TransactionDao;
 import transfer.dao.transaction.JooqTransactionProvider;
 import transfer.model.Transaction;
-import transfer.model.exception.AccountDoNotHaveEhoughMoneyException;
+import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
 import transfer.service.TransactionService;
 
@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new AccountNotExistException(toAccountId);
             }
             if (fromAccount.get().getBalance().compareTo(amount) < 0) {
-                throw new AccountDoNotHaveEhoughMoneyException(fromAccountId);
+                throw new AccountDoNotHaveEnoughMoneyException(fromAccountId);
             }
 
             accountDao.updateLocked(fromAccount.get().minus(amount), configuration);
