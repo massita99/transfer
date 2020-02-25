@@ -98,4 +98,20 @@ class AccountControllerTest {
         assertThatThrownBy(() -> client.toBlocking().exchange(request, Account.class));
     }
 
+    @Test
+    public void testCreate() {
+        //Given
+        when(accountService.create())
+                .thenReturn(TEST_ACCOUNT);
+        HttpRequest<String> request = HttpRequest.PUT("/api/accounts", "");
+
+        //When
+        var response = client.toBlocking().exchange(request, Account.class);
+
+        //Then
+        assertEquals(response.getStatus(), HttpStatus.OK);
+        assertThat(response.body()).isInstanceOf(Account.class);
+
+    }
+
 }

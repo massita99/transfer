@@ -4,6 +4,8 @@ import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import transfer.TestHelper;
 import transfer.model.Account;
+import transfer.model.exception.AccountDoNotHaveEhoughMoneyException;
+import transfer.model.exception.AccountNotExistException;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
@@ -46,7 +48,8 @@ class TransactionServiceTest {
         Account accountTo = new Account();
 
         //Then
-        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
+        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN))
+                .isInstanceOf(AccountNotExistException.class);
     }
 
     @Test
@@ -56,7 +59,8 @@ class TransactionServiceTest {
         Account accountTo = accountService.create();
 
         //Then
-        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN));
+        assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN))
+                .isInstanceOf(AccountDoNotHaveEhoughMoneyException.class);
     }
 
     @Test

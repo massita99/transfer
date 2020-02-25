@@ -1,10 +1,7 @@
 package transfer.controller;
 
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.*;
 import transfer.model.Account;
 import transfer.service.AccountService;
 
@@ -28,6 +25,13 @@ public class AccountController {
     public HttpResponse<Account> getAllAccounts(@Body String accountId) {
         var account = accountService.getById(accountId);
         return HttpResponse.ok(account);
+    }
+
+    @Put
+    @Consumes
+    @Produces
+    public HttpResponse<Account> createAccount() {
+        return HttpResponse.ok(accountService.create());
     }
 
 
