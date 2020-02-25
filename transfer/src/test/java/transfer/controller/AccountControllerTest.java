@@ -7,11 +7,13 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import org.junit.jupiter.api.Test;
+import transfer.dto.AccountData;
 import transfer.model.Account;
 import transfer.model.exception.AccountNotExistException;
 import transfer.service.AccountService;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -80,11 +82,11 @@ class AccountControllerTest {
         HttpRequest<String> request = HttpRequest.GET("/api/accounts/" + TEST_UUID);
 
         //When
-        var response = client.toBlocking().exchange(request, Account.class);
+        var response = client.toBlocking().exchange(request, AccountData.class);
 
         //Then
         assertEquals(response.getStatus(), HttpStatus.OK);
-        assertThat(response.body()).isEqualTo(TEST_ACCOUNT);
+        assertThat(response.body()).extracting(AccountData::getId).isEqualTo(TEST_ACCOUNT.getId());
     }
 
     @Test
@@ -95,7 +97,7 @@ class AccountControllerTest {
         HttpRequest<String> request = HttpRequest.GET("/api/accounts/" + TEST_UUID);
 
         //When Then
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, Account.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, AccountData.class));
     }
 
     @Test
@@ -106,12 +108,11 @@ class AccountControllerTest {
         HttpRequest<String> request = HttpRequest.PUT("/api/accounts", "");
 
         //When
-        var response = client.toBlocking().exchange(request, Account.class);
+        var response = client.toBlocking().exchange(request, AccountData.class);
 
         //Then
         assertEquals(response.getStatus(), HttpStatus.OK);
-        assertThat(response.body()).isInstanceOf(Account.class);
-
+        assertThat(response.body()).extracting(AccountData::getBalance).isEqualTo(BigDecimal.ZERO);
     }
 
 }
