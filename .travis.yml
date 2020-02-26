@@ -6,6 +6,6 @@ dist: trusty
 jdk: oraclejdk11
 
 script:
-  - cd transfer && ./gradlew build
+  - ./gradlew build
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/massita99/transfer.svg?branch=master)](https://travis-ci.org/massita99/transfer)
+[![codecov](https://codecov.io/gh/massita99/transfer/branch/master/graph/badge.svg)](https://codecov.io/gh/massita99/transfer)
 # Transfer
 RESTful API for money transfer between accounts
 
