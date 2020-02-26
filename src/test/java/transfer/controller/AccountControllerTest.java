@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import static io.micronaut.http.HttpStatus.NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,7 +98,8 @@ class AccountControllerTest {
         HttpRequest<String> request = HttpRequest.GET("/api/accounts/" + TEST_UUID);
 
         //When Then
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, AccountData.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, AccountData.class))
+                .hasMessage(NOT_FOUND.getReason());
     }
 
     @Test

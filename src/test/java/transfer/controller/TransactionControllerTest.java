@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import static io.micronaut.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -79,7 +80,8 @@ public class TransactionControllerTest {
         HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TEST_UUID);
 
         //When Then
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, Collection.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, Collection.class))
+                .hasMessage(NOT_FOUND.getReason());
     }
 
     @Test
@@ -92,7 +94,7 @@ public class TransactionControllerTest {
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", goodTransferData);
 
         //When
-        var response = client.toBlocking().exchange(request, String.class);
+        client.toBlocking().exchange(request, String.class);
 
         //Then
         verify(transactionService, times(1)).performTransaction(goodTransferData.getAccountFromId(),
@@ -102,13 +104,16 @@ public class TransactionControllerTest {
     @Test
     public void testFailTransferOnAccountNotExist() {
         //Given
-        doThrow(new AccountNotExistException(TEST_UUID)).when(transactionService).performTransaction(TEST_TRANSFER.getAccountFromId(),
-                TEST_TRANSFER.getAccountToId(), TEST_TRANSFER.getAmount());
+        doThrow(new AccountNotExistException(TEST_UUID)).when(transactionService).performTransaction(
+                TEST_TRANSFER.getAccountFromId(),
+                TEST_TRANSFER.getAccountToId(),
+                TEST_TRANSFER.getAmount());
 
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
 
         //When
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, Void.class))
+                .hasMessage(BAD_REQUEST.getReason());
 
     }
 
@@ -121,7 +126,8 @@ public class TransactionControllerTest {
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
 
         //When
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class))
+                .hasMessage(BAD_REQUEST.getReason());
     }
 
     @Test
@@ -131,6 +137,7 @@ public class TransactionControllerTest {
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
 
         //When
-        assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class));
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class))
+                .hasMessage(BAD_REQUEST.getReason());
     }
 }
