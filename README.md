@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/massita99/transfer.svg?branch=master)](https://travis-ci.org/massita99/transfer)
 # Transfer
 RESTful API for money transfer between accounts
 
