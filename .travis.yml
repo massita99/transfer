@@ -6,4 +6,4 @@ dist: trusty
 jdk: oraclejdk11
 
 script:
-  - cd transfer && ./gradlew build --scan -s
+  - cd transfer && ./gradlew build
