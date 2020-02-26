@@ -1,5 +1,6 @@
 package transfer.service.impl;
 
+import transfer.aop.annotation.DebugLog;
 import transfer.dao.AccountDao;
 import transfer.dao.TransactionDao;
 import transfer.dao.transaction.JooqTransactionProvider;
@@ -27,6 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
+    @DebugLog
     public void performTransaction(String fromAccountId, String toAccountId, BigDecimal amount) {
         transactionProvider.doInTransaction(configuration -> {
 

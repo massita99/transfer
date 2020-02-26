@@ -19,4 +19,8 @@
         <AppenderRef ref="STDOUT"/>
     </Logger>
 
+    <Logger name="transfer.aop" level="debug">
+        <AppenderRef ref="STDOUT"/>
+    </Logger>
+
 </configuration>

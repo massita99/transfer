@@ -1,5 +1,6 @@
 package transfer.service.impl;
 
+import transfer.aop.annotation.DebugLog;
 import transfer.dao.AccountDao;
 import transfer.model.Account;
 import transfer.model.exception.AccountNotExistException;
@@ -16,6 +17,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountDao accountDao;
 
     @Override
+    @DebugLog
     public Account create() {
         return accountDao.create();
     }
