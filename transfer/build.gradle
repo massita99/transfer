@@ -21,6 +21,7 @@ ext{
     mockitoJunitVersion = '2.17.0'
     modelMapperVersion = '2.17.0'
     modelMapperJooqVersion = '2.3.6'
+    awaitilityVersion = '3.0.0'
 }
 
 version "0.1"
@@ -40,6 +41,7 @@ dependencies {
     annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
+    annotationProcessor "io.micronaut.configuration:micronaut-openapi"
 
     implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     implementation "io.micronaut:micronaut-inject"
@@ -53,6 +55,8 @@ dependencies {
     implementation 'org.jooq:jooq'
     implementation "org.modelmapper:modelmapper:$modelMapperJooqVersion"
     implementation "org.modelmapper.extensions:modelmapper-jooq:$modelMapperJooqVersion"
+    implementation "io.swagger.core.v3:swagger-annotations"
+
 
     compile 'io.micronaut.configuration:micronaut-jooq'
 
@@ -69,7 +73,7 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:$rootProject.ext.mockitoJunitVersion"
     testImplementation "net.bytebuddy:byte-buddy:1.8.22"
     testImplementation "net.bytebuddy:byte-buddy-agent:1.8.22"
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
+    testImplementation "org.awaitility:awaitility:$rootProject.ext.awaitilityVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-params"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$rootProject.ext.junitVersion"

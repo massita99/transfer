@@ -1,14 +1,19 @@
 package transfer.controller;
 
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.netty.util.internal.StringUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
-import transfer.dto.AccountData;
 import transfer.dto.TransactionData;
 import transfer.dto.TransferData;
-import transfer.model.Account;
 import transfer.model.Transaction;
 import transfer.model.exception.BadRequestException;
 import transfer.service.TransactionService;
@@ -16,12 +21,11 @@ import transfer.service.TransactionService;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Controller("api/transactions")
+@Controller("/api/transactions")
 public class TransactionController {
-
-    public static final String ACCOUNT_ID_PARAMETER = "accountId";
 
     @Inject
     TransactionService transactionService;
@@ -29,21 +33,61 @@ public class TransactionController {
     @Inject
     private ModelMapper modelMapper;
 
-    @Get
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @Get("/{?accountId}")
     @Produces
-    public Collection<TransactionData> getAllTransactions(HttpRequest<?> request) {
-        String accountId = request.getParameters()
-                .getFirst(ACCOUNT_ID_PARAMETER)
-                .orElse(null);
-        if (accountId == null) {
+    @Operation(summary = "Get all transactions",
+            description = "Receive all or all account transactions stored in repository"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Array of transactions",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = TransactionData.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            )
+    })
+    @Tag(name = "transaction")
+    public Collection<TransactionData> getAllTransactions(@Parameter(description = "ID of account") Optional<String> accountId) {
+
+        if (accountId.isEmpty()) {
             return mapToDto(transactionService.getAll());
         }
-        return mapToDto(transactionService.getAllByAccountId(accountId));
+        return mapToDto(transactionService.getAllByAccountId(accountId.get()));
     }
 
     @Post
     @Produces
     @Consumes
+    @Operation(summary = "Perform money transfer",
+            description = "Perform money transfer between two accounts"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transaction successfully performed"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Request day is wrong: whether accountIds is empty, account have not enough money" +
+                            " or amount is smaller than 0"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Another transaction performed on account, try later"
+            )
+    })
+    @Tag(name = "transfer")
     public HttpStatus performTransfer(@Body TransferData data) {
 
         if (checkRequest(data)) {
