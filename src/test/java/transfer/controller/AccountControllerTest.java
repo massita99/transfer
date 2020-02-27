@@ -107,8 +107,9 @@ class AccountControllerTest {
         var response = client.toBlocking().exchange(request, AccountData.class);
 
         //Then
-        assertEquals(response.getStatus(), HttpStatus.OK);
+        assertEquals(response.getStatus(), HttpStatus.CREATED);
         assertThat(response.body()).extracting(AccountData::getBalance).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getHeaders().get("Location")).isNotEmpty();
     }
 
 }

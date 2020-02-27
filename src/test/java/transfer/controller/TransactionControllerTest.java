@@ -17,6 +17,7 @@ import transfer.service.TransactionService;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
@@ -117,7 +118,10 @@ public class TransactionControllerTest {
         goodTransferData.setAccountFromId(TestHelper.TEST_UUID);
         goodTransferData.setAccountToId(TestHelper.TEST_UUID);
         goodTransferData.setAmount(BigDecimal.TEN);
+
         var goodTransactionData = new Transaction(TestHelper.TEST_UUID, TestHelper.TEST_UUID, BigDecimal.TEN);
+        goodTransactionData.setId(BigInteger.ONE);
+
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", goodTransferData);
         when(transactionService.performTransaction(TestHelper.TEST_UUID, TestHelper.TEST_UUID, BigDecimal.TEN))
                 .thenReturn(goodTransactionData);
@@ -127,6 +131,7 @@ public class TransactionControllerTest {
 
         //Then
         assertThat(transaction.getBody().get().getAmount()).isEqualTo(BigDecimal.TEN);
+        assertThat(transaction.getHeaders().get("Location")).isNotEmpty();
     }
 
     @Test

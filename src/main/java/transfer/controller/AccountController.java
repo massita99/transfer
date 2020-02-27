@@ -1,9 +1,11 @@
 package transfer.controller;
 
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +18,7 @@ import transfer.model.Account;
 import transfer.service.AccountService;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -81,8 +84,13 @@ public class AccountController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "Account successfully created",
+                    headers = @Header(
+                            name = "uri",
+                            description = "Created account uri",
+                            schema = @Schema(type = "string", format = "uri")
+                    ),
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = AccountData.class)
@@ -90,9 +98,10 @@ public class AccountController {
             )
     })
     @Tag(name = "account")
-    public HttpResponse<AccountData> createAccount() {
+    public HttpResponse<AccountData> createAccount(HttpRequest<?> request) {
         var newAccount = mapToDto(accountService.create());
-        return HttpResponse.ok(newAccount);
+        URI uri = HttpResponse.uri(request.getPath() + "/" + newAccount.getId());
+        return HttpResponse.created(newAccount, uri);
     }
 
     private AccountData mapToDto(Account account) {

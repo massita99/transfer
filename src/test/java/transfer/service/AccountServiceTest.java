@@ -57,7 +57,7 @@ public class AccountServiceTest {
     @Test
     void testGetNoAccountForNotExistedId() {
         //When Then
-        assertThatThrownBy(() -> accountService.getById(TestHelper.TEST_UUID));
+        assertThatThrownBy(() -> accountService.getById(TestHelper.TEST_FAKE_ACCOUNT.getId()));
     }
 
     @Test

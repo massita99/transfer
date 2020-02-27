@@ -1,11 +1,12 @@
 package transfer.controller;
 
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.netty.util.internal.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +24,7 @@ import transfer.service.TransactionService;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,7 +45,7 @@ public class TransactionController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "Requested transaction",
                     content = @Content(
                             mediaType = "application/json",
@@ -99,8 +101,13 @@ public class TransactionController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "Transaction successfully performed",
+                    headers = @Header(
+                            name = "uri",
+                            description = "Created transaction uri",
+                            schema = @Schema(type = "string", format = "uri")
+                    ),
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = AccountData.class)
@@ -121,13 +128,17 @@ public class TransactionController {
             )
     })
     @Tag(name = "transfer")
-    public HttpResponse<TransactionData> performTransfer(@Body TransferData data) {
+    public HttpResponse<TransactionData> performTransfer(@Body TransferData data, HttpRequest<?> request) {
 
         if (checkRequest(data)) {
             throw new BadRequestException(data.toString());
         }
-        var transaction = transactionService.performTransaction(data.getAccountFromId(), data.getAccountToId(), data.getAmount());
-        return HttpResponse.ok(mapToDto(transaction));
+        var transaction = mapToDto(transactionService.performTransaction(data.getAccountFromId(),
+                data.getAccountToId(),
+                data.getAmount()));
+
+        URI uri = HttpResponse.uri(request.getPath() + "/" + transaction.getId());
+        return HttpResponse.created(transaction, uri);
     }
 
     private boolean checkRequest(@Body TransferData data) {
