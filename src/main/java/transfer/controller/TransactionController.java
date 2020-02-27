@@ -1,5 +1,6 @@
 package transfer.controller;
 
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.netty.util.internal.StringUtil;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
+import transfer.dto.AccountData;
 import transfer.dto.TransactionData;
 import transfer.dto.TransferData;
 import transfer.model.Transaction;
@@ -71,7 +73,11 @@ public class TransactionController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Transaction successfully performed"
+                    description = "Transaction successfully performed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AccountData.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -88,13 +94,13 @@ public class TransactionController {
             )
     })
     @Tag(name = "transfer")
-    public HttpStatus performTransfer(@Body TransferData data) {
+    public HttpResponse<TransactionData> performTransfer(@Body TransferData data) {
 
         if (checkRequest(data)) {
             throw new BadRequestException(data.toString());
         }
-        transactionService.performTransaction(data.getAccountFromId(), data.getAccountToId(), data.getAmount());
-        return HttpStatus.OK;
+        var transaction = transactionService.performTransaction(data.getAccountFromId(), data.getAccountToId(), data.getAmount());
+        return HttpResponse.ok(mapToDto(transaction));
     }
 
     private boolean checkRequest(@Body TransferData data) {

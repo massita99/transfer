@@ -6,6 +6,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import org.junit.jupiter.api.Test;
+import transfer.dto.TransactionData;
 import transfer.dto.TransferData;
 import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
@@ -91,14 +92,16 @@ public class TransactionControllerTest {
         goodTransferData.setAccountFromId(TEST_UUID);
         goodTransferData.setAccountToId(TEST_UUID);
         goodTransferData.setAmount(BigDecimal.TEN);
+        var goodTransactionData = new Transaction(TEST_UUID, TEST_UUID, BigDecimal.TEN);
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", goodTransferData);
+        when(transactionService.performTransaction(TEST_UUID, TEST_UUID, BigDecimal.TEN))
+                .thenReturn(goodTransactionData);
 
         //When
-        client.toBlocking().exchange(request, String.class);
+        var transaction = client.toBlocking().exchange(request, TransactionData.class);
 
         //Then
-        verify(transactionService, times(1)).performTransaction(goodTransferData.getAccountFromId(),
-                goodTransferData.getAccountToId(), goodTransferData.getAmount());
+        assertThat(transaction.getBody().get().getAmount()).isEqualTo(BigDecimal.TEN);
     }
 
     @Test

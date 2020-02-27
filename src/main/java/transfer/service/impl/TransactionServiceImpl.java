@@ -1,5 +1,6 @@
 package transfer.service.impl;
 
+import org.jooq.Configuration;
 import transfer.aop.annotation.DebugLog;
 import transfer.dao.AccountDao;
 import transfer.dao.TransactionDao;
@@ -24,13 +25,13 @@ public class TransactionServiceImpl implements TransactionService {
     private AccountDao accountDao;
 
     @Inject
-    private JooqTransactionProvider transactionProvider;
+    private JooqTransactionProvider<Transaction> transactionProvider;
 
 
     @Override
     @DebugLog
-    public void performTransaction(String fromAccountId, String toAccountId, BigDecimal amount) {
-        transactionProvider.doInTransaction(configuration -> {
+    public Transaction performTransaction(String fromAccountId, String toAccountId, BigDecimal amount) {
+        return transactionProvider.returnInTransaction(configuration -> {
 
             var fromAccount = accountDao.lockAndGet(fromAccountId, configuration);
             var toAccount = accountDao.lockAndGet(toAccountId, configuration);
@@ -47,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
             accountDao.updateLocked(fromAccount.get().minus(amount), configuration);
             accountDao.updateLocked(toAccount.get().plus(amount), configuration);
 
-            transactionDao.createInTransaction(fromAccountId, toAccountId, amount, configuration);
+            return transactionDao.createInTransaction(fromAccountId, toAccountId, amount, configuration);
         });
     }
 

@@ -4,6 +4,7 @@ import io.micronaut.test.annotation.MicronautTest;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import transfer.dao.AccountDao;
+import transfer.model.Transaction;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import static org.awaitility.Awaitility.await;
 class JooqTransactionProviderTest {
 
     @Inject
-    JooqTransactionProvider transactionProvider;
+    JooqTransactionProvider<Transaction> transactionProvider;
 
     @Inject
     AccountDao accountDao;

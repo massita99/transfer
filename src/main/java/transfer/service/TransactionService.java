@@ -21,7 +21,7 @@ public interface TransactionService {
      * @Throws {@link transfer.model.exception.AccountNotExistException} if one of accounts not exist
      * @Throws {@link AccountDoNotHaveEnoughMoneyException} if no enough money exception
      */
-    void performTransaction(String fromAccountId, String toAccountId, BigDecimal amount);
+    Transaction performTransaction(String fromAccountId, String toAccountId, BigDecimal amount);
 
     /**
      * Return all stored {@link Transaction}s
