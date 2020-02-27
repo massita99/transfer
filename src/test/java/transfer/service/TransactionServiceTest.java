@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static transfer.TestHelper.TEST_FAKE_ACCOUNT;
 
 @MicronautTest
 class TransactionServiceTest {
@@ -29,7 +30,7 @@ class TransactionServiceTest {
     void testCreateNewTransaction() {
         //Given
         Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
-        Account accountTo = accountService.create();
+        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
 
         //When
         transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
@@ -44,8 +45,8 @@ class TransactionServiceTest {
     @Test
     void testDoNotCreateNewTransactionForNotExistedAccount() {
         //Given
-        Account accountFrom = new Account();
-        Account accountTo = new Account();
+        Account accountFrom = TEST_FAKE_ACCOUNT;
+        Account accountTo = TEST_FAKE_ACCOUNT;
 
         //Then
         assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN))
@@ -55,8 +56,8 @@ class TransactionServiceTest {
     @Test
     void testDoNotCreateNewTransactionIfNotEnoughMoney() {
         //Given
-        Account accountFrom = accountService.create();
-        Account accountTo = accountService.create();
+        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.ZERO);
+        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
 
         //Then
         assertThatThrownBy(() -> transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN))
@@ -67,7 +68,7 @@ class TransactionServiceTest {
     void testGetAllExistedTransactions() {
         //Given
         Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
-        Account accountTo = accountService.create();
+        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
         transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
 
         //When
@@ -80,7 +81,7 @@ class TransactionServiceTest {
     void testGetAllExistedTransactionsByAccount() {
         //Given
         Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
-        Account accountTo = accountService.create();
+        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
 
         //Make two transactions with same accounts
         transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);

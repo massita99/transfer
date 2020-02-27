@@ -7,12 +7,13 @@ RESTful API for money transfer between accounts
 
 `./gradlew run`
 
-The command run bot on localhost on port 8080.
+The command run endpoint on localhost on port 8080.
 All API documentation hosted by Swagger-UI on http://localhost:8080/swagger/views/swagger-ui/index.html
+For test reason one can use test account with id = 'TEST'
 
 `./gradlew test`
 
-the command run all test
+the command run all tests
 
 ### Used Technologies
 * https://micronaut.io - stand-alone App container

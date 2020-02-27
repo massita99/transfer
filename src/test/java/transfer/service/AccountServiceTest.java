@@ -2,6 +2,7 @@ package transfer.service;
 
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+import transfer.TestHelper;
 
 import javax.inject.Inject;
 
@@ -10,8 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @MicronautTest
 public class AccountServiceTest {
-
-    public static final String TEST_UUID = "A-A-A-A-A";
 
     @Inject
     AccountService accountService;
@@ -58,7 +57,7 @@ public class AccountServiceTest {
     @Test
     void testGetNoAccountForNotExistedId() {
         //When Then
-        assertThatThrownBy(() -> accountService.getById(TEST_UUID));
+        assertThatThrownBy(() -> accountService.getById(TestHelper.TEST_UUID));
     }
 
     @Test

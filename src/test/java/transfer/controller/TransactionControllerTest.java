@@ -6,6 +6,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import org.junit.jupiter.api.Test;
+import transfer.TestHelper;
 import transfer.dto.TransactionData;
 import transfer.dto.TransferData;
 import transfer.model.Transaction;
@@ -26,10 +27,6 @@ import static org.mockito.Mockito.*;
 @MicronautTest
 public class TransactionControllerTest {
 
-    public static final Transaction TEST_TRANSACTION = new Transaction();
-    public static final TransferData TEST_TRANSFER = new TransferData();
-    public static final String TEST_UUID = "A-A-A-A-A";
-
     @Inject
     @Client("/")
     RxHttpClient client;
@@ -46,7 +43,7 @@ public class TransactionControllerTest {
     public void testGetAllTransactions() {
         //Given
         when(transactionService.getAll())
-                .thenReturn(List.of(TEST_TRANSACTION));
+                .thenReturn(List.of(TestHelper.TEST_FAKE_TRANSACTION));
         HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions");
 
         //When
@@ -61,9 +58,9 @@ public class TransactionControllerTest {
     @Test
     public void testGetAllTransactionsByAccountId() {
         //Given
-        when(transactionService.getAllByAccountId(TEST_UUID))
-                .thenReturn(List.of(TEST_TRANSACTION));
-        HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TEST_UUID);
+        when(transactionService.getAllByAccountId(TestHelper.TEST_UUID))
+                .thenReturn(List.of(TestHelper.TEST_FAKE_TRANSACTION));
+        HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TestHelper.TEST_UUID);
 
         //When
         var response = client.toBlocking().exchange(request, Collection.class);
@@ -76,9 +73,9 @@ public class TransactionControllerTest {
     @Test
     public void testFailOnGetAllTransactionsByNotExistedAccountId() {
         //Given
-        when(transactionService.getAllByAccountId(TEST_UUID))
-                .thenThrow(new AccountNotExistException(TEST_UUID));
-        HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TEST_UUID);
+        when(transactionService.getAllByAccountId(TestHelper.TEST_UUID))
+                .thenThrow(new AccountNotExistException(TestHelper.TEST_UUID));
+        HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TestHelper.TEST_UUID);
 
         //When Then
         assertThatThrownBy(() -> client.toBlocking().exchange(request, Collection.class))
@@ -89,12 +86,12 @@ public class TransactionControllerTest {
     public void testGoodTransfer() {
         //Given
         var goodTransferData = new TransferData();
-        goodTransferData.setAccountFromId(TEST_UUID);
-        goodTransferData.setAccountToId(TEST_UUID);
+        goodTransferData.setAccountFromId(TestHelper.TEST_UUID);
+        goodTransferData.setAccountToId(TestHelper.TEST_UUID);
         goodTransferData.setAmount(BigDecimal.TEN);
-        var goodTransactionData = new Transaction(TEST_UUID, TEST_UUID, BigDecimal.TEN);
+        var goodTransactionData = new Transaction(TestHelper.TEST_UUID, TestHelper.TEST_UUID, BigDecimal.TEN);
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", goodTransferData);
-        when(transactionService.performTransaction(TEST_UUID, TEST_UUID, BigDecimal.TEN))
+        when(transactionService.performTransaction(TestHelper.TEST_UUID, TestHelper.TEST_UUID, BigDecimal.TEN))
                 .thenReturn(goodTransactionData);
 
         //When
@@ -107,12 +104,12 @@ public class TransactionControllerTest {
     @Test
     public void testFailTransferOnAccountNotExist() {
         //Given
-        doThrow(new AccountNotExistException(TEST_UUID)).when(transactionService).performTransaction(
-                TEST_TRANSFER.getAccountFromId(),
-                TEST_TRANSFER.getAccountToId(),
-                TEST_TRANSFER.getAmount());
+        doThrow(new AccountNotExistException(TestHelper.TEST_UUID)).when(transactionService).performTransaction(
+                TestHelper.TEST_TRANSFER.getAccountFromId(),
+                TestHelper.TEST_TRANSFER.getAccountToId(),
+                TestHelper.TEST_TRANSFER.getAmount());
 
-        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
+        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TestHelper.TEST_TRANSFER);
 
         //When
         assertThatThrownBy(() -> client.toBlocking().exchange(request, Void.class))
@@ -123,10 +120,10 @@ public class TransactionControllerTest {
     @Test
     public void testFailTransferOnNotEnoughMoney() {
         //Given
-        doThrow(new AccountDoNotHaveEnoughMoneyException(TEST_UUID)).when(transactionService).performTransaction(TEST_TRANSFER.getAccountFromId(),
-                TEST_TRANSFER.getAccountToId(), TEST_TRANSFER.getAmount());
+        doThrow(new AccountDoNotHaveEnoughMoneyException(TestHelper.TEST_UUID)).when(transactionService).performTransaction(TestHelper.TEST_TRANSFER.getAccountFromId(),
+                TestHelper.TEST_TRANSFER.getAccountToId(), TestHelper.TEST_TRANSFER.getAmount());
 
-        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
+        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TestHelper.TEST_TRANSFER);
 
         //When
         assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class))
@@ -137,7 +134,7 @@ public class TransactionControllerTest {
     public void testEmptyAccountIdInRequest() {
         //Given
         var badTransferData = new TransferData();
-        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TEST_TRANSFER);
+        HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TestHelper.TEST_TRANSFER);
 
         //When
         assertThatThrownBy(() -> client.toBlocking().exchange(request, String.class))
