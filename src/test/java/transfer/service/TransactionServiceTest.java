@@ -4,11 +4,13 @@ import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import transfer.TestHelper;
 import transfer.model.Account;
+import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -67,14 +69,19 @@ class TransactionServiceTest {
     @Test
     void testGetAllExistedTransactions() {
         //Given
-        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
-        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
-        transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
+        var createdTransaction = createTransaction();
 
         //When
         var transactions = transactionService.getAll();
         //Then
         assertThat(transactions).isNotEmpty();
+    }
+
+    private Transaction createTransaction() {
+        Account accountFrom = testHelper.createAccountWithMoney(BigDecimal.TEN);
+        Account accountTo = testHelper.createAccountWithMoney(BigDecimal.ZERO);
+
+        return transactionService.performTransaction(accountFrom.getId(), accountTo.getId(), BigDecimal.TEN);
     }
 
     @Test
@@ -91,6 +98,23 @@ class TransactionServiceTest {
         var transactions = transactionService.getAllByAccountId(accountFrom.getId());
         //Then
         assertThat(transactions.size()).isEqualTo(2);
+    }
+
+    @Test
+    void testGetExistedTransactionById() {
+        //Given
+        var createdTransaction = createTransaction();
+
+        //When
+        var transactions = transactionService.getById(createdTransaction.getId());
+        //Then
+        assertThat(transactions).isEqualTo(createdTransaction);
+    }
+
+    @Test
+    void testGetNoAccountForNotExistedId() {
+        //When Then
+        assertThatThrownBy(() -> transactionService.getById(BigInteger.TEN));
     }
 
 }

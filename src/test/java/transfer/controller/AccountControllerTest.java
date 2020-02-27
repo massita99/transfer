@@ -51,7 +51,6 @@ class AccountControllerTest {
         var response = client.toBlocking().exchange(request, Collection.class);
 
         //Then
-        assertThat(response).isNotNull();
         assertThat(response.body().size()).isEqualTo(2);
 
     }
@@ -67,7 +66,6 @@ class AccountControllerTest {
         var response = client.toBlocking().exchange(request, Collection.class);
 
         //Then
-        assertThat(response).isNotNull();
         assertThat(response.body()).isEmpty();
     }
 

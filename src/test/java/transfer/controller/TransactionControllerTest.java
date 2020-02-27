@@ -12,6 +12,7 @@ import transfer.dto.TransferData;
 import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
+import transfer.model.exception.TransactionNotExistException;
 import transfer.service.TransactionService;
 
 import javax.inject.Inject;
@@ -19,10 +20,13 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
-import static io.micronaut.http.HttpStatus.*;
+import static io.micronaut.http.HttpStatus.BAD_REQUEST;
+import static io.micronaut.http.HttpStatus.NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import static transfer.TestHelper.TEST_FAKE_TRANSACTION;
+import static transfer.TestHelper.TEST_ID;
 
 @MicronautTest
 public class TransactionControllerTest {
@@ -40,33 +44,57 @@ public class TransactionControllerTest {
     }
 
     @Test
+    public void testGetAccountNotFoundById() {
+        //Given
+        when(transactionService.getById(TEST_ID))
+                .thenThrow(new TransactionNotExistException(TEST_ID.toString()));
+        HttpRequest<String> request = HttpRequest.GET("/api/transactions/" + TEST_ID);
+
+        //When Then
+        assertThatThrownBy(() -> client.toBlocking().exchange(request, TransactionData.class))
+                .hasMessage(NOT_FOUND.getReason());
+    }
+
+    @Test
     public void testGetAllTransactions() {
         //Given
         when(transactionService.getAll())
-                .thenReturn(List.of(TestHelper.TEST_FAKE_TRANSACTION));
+                .thenReturn(List.of(TEST_FAKE_TRANSACTION));
         HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions");
 
         //When
         var response = client.toBlocking().exchange(request, Collection.class);
 
         //Then
-        assertThat(response).isNotNull();
         assertThat(response.body().size()).isEqualTo(1);
 
+    }
+
+    @Test
+    public void testTransactionById() {
+        //Given
+        when(transactionService.getById(TEST_ID))
+                .thenReturn(TEST_FAKE_TRANSACTION);
+        HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions/" + TEST_ID);
+
+        //When
+        var response = client.toBlocking().exchange(request, TransactionData.class);
+
+        //Then
+        assertThat(response.body().getId()).isEqualTo(TEST_FAKE_TRANSACTION.getId());
     }
 
     @Test
     public void testGetAllTransactionsByAccountId() {
         //Given
         when(transactionService.getAllByAccountId(TestHelper.TEST_UUID))
-                .thenReturn(List.of(TestHelper.TEST_FAKE_TRANSACTION));
+                .thenReturn(List.of(TEST_FAKE_TRANSACTION));
         HttpRequest<Transaction> request = HttpRequest.GET("/api/transactions?accountId=" + TestHelper.TEST_UUID);
 
         //When
         var response = client.toBlocking().exchange(request, Collection.class);
 
         //Then
-        assertThat(response).isNotNull();
         assertThat(response.body().size()).isEqualTo(1);
     }
 
@@ -120,8 +148,10 @@ public class TransactionControllerTest {
     @Test
     public void testFailTransferOnNotEnoughMoney() {
         //Given
-        doThrow(new AccountDoNotHaveEnoughMoneyException(TestHelper.TEST_UUID)).when(transactionService).performTransaction(TestHelper.TEST_TRANSFER.getAccountFromId(),
-                TestHelper.TEST_TRANSFER.getAccountToId(), TestHelper.TEST_TRANSFER.getAmount());
+        doThrow(new AccountDoNotHaveEnoughMoneyException(TestHelper.TEST_UUID)).when(transactionService)
+                .performTransaction(TestHelper.TEST_TRANSFER.getAccountFromId(),
+                        TestHelper.TEST_TRANSFER.getAccountToId(),
+                        TestHelper.TEST_TRANSFER.getAmount());
 
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TestHelper.TEST_TRANSFER);
 
@@ -133,7 +163,6 @@ public class TransactionControllerTest {
     @Test
     public void testEmptyAccountIdInRequest() {
         //Given
-        var badTransferData = new TransferData();
         HttpRequest<TransferData> request = HttpRequest.POST("/api/transactions", TestHelper.TEST_TRANSFER);
 
         //When

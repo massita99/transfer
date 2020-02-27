@@ -22,6 +22,7 @@ import transfer.service.TransactionService;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,6 +35,32 @@ public class TransactionController {
 
     @Inject
     private ModelMapper modelMapper;
+
+    @Get(uri = "/{transactionId}")
+    @Produces
+    @Operation(summary = "Get transaction by id",
+            description = "Retrieve transaction by id stored in DataBase"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Requested transaction",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionData.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found"
+            )
+    })
+    @Tag(name = "transaction")
+    public HttpResponse<TransactionData> getTransactionById(@Parameter(description = "ID of transaction") BigInteger transactionId) {
+        var transaction = mapToDto(transactionService.getById(transactionId));
+        return HttpResponse.ok(transaction);
+    }
+
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Get("/{?accountId}")

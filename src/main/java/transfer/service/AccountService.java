@@ -19,7 +19,6 @@ public interface AccountService {
 
     /**
      * Return {@link Account} by id
-     * Otherwise return empty {@link Optional}
      *
      * @param id - id of account
      * @return stored {@link Account} with specified id

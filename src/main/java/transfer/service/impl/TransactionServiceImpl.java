@@ -8,11 +8,13 @@ import transfer.dao.transaction.JooqTransactionProvider;
 import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 import transfer.model.exception.AccountNotExistException;
+import transfer.model.exception.TransactionNotExistException;
 import transfer.service.TransactionService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Singleton
@@ -50,6 +52,12 @@ public class TransactionServiceImpl implements TransactionService {
 
             return transactionDao.createInTransaction(fromAccountId, toAccountId, amount, configuration);
         });
+    }
+
+    @Override
+    public Transaction getById(BigInteger id) {
+        return transactionDao.find(id).
+                orElseThrow(() -> new TransactionNotExistException(id.toString()));
     }
 
     @Override

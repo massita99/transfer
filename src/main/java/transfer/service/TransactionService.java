@@ -6,7 +6,9 @@ import transfer.model.Transaction;
 import transfer.model.exception.AccountDoNotHaveEnoughMoneyException;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service provide interface to work with transactions
@@ -22,6 +24,15 @@ public interface TransactionService {
      * @Throws {@link AccountDoNotHaveEnoughMoneyException} if no enough money exception
      */
     Transaction performTransaction(String fromAccountId, String toAccountId, BigDecimal amount);
+
+    /**
+     * Return {@link Transaction} by id
+     *
+     * @param id - id of account
+     * @return stored {@link Transaction} with specified id
+     * @Throws {@link transfer.model.exception.TransactionNotExistException} if transaction not exist
+     */
+    Transaction getById(BigInteger id);
 
     /**
      * Return all stored {@link Transaction}s
